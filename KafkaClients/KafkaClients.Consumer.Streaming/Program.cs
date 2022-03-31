@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Threading;
+using Confluent.Kafka;
+
 
 namespace KafkaClients.Consumer.Streaming
 {
@@ -6,7 +9,7 @@ namespace KafkaClients.Consumer.Streaming
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            
         }
     }
 }
