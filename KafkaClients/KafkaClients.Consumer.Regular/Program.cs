@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Confluent.Kafka;
 
@@ -22,7 +22,7 @@ namespace KafkaClients.Consumer.Regular
 
             using (var c = new ConsumerBuilder<Ignore, string>(conf).Build())
             {
-                c.Subscribe("meeting-booked");
+                c.Subscribe("^meeting-booked|meeting-cancelled");
 
                 CancellationTokenSource cts = new CancellationTokenSource();
                 Console.CancelKeyPress += (_, e) =>
@@ -38,7 +38,7 @@ namespace KafkaClients.Consumer.Regular
                         try
                         {
                             var cr = c.Consume(cts.Token);
-                            Console.WriteLine($"Consumed message '{cr.Value}' at: '{cr.TopicPartitionOffset}'.");
+                            Console.WriteLine($"Consumed message '{cr.Message.Value}' at: '{cr.TopicPartitionOffset}'.");
                         }
                         catch (ConsumeException e)
                         {
