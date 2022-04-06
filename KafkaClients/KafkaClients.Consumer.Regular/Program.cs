@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using Confluent.Kafka;
+using Kafka.Dto;
+using Newtonsoft.Json;
 
 namespace KafkaClients.Consumer.Regular
 {
@@ -10,13 +12,16 @@ namespace KafkaClients.Consumer.Regular
         {
             var conf = new ConsumerConfig
             {
-                GroupId = "test-consumer-group",
-                BootstrapServers = "localhost:9092"
+                GroupId = "user-json-group2",
+                BootstrapServers = "localhost:9092",
+                AutoOffsetReset = AutoOffsetReset.Latest,
+                EnableAutoCommit = false
             };
 
-            using (var c = new ConsumerBuilder<Ignore, string>(conf).Build())
+            using (var c = new ConsumerBuilder<Null, string>(conf).Build())
             {
-                c.Subscribe("^meeting-booked|meeting-cancelled");
+                //c.Subscribe("^meeting-booked|meeting-cancelled");
+                c.Subscribe("json-topic");
 
                 CancellationTokenSource cts = new CancellationTokenSource();
                 Console.CancelKeyPress += (_, e) =>
@@ -33,6 +38,8 @@ namespace KafkaClients.Consumer.Regular
                         {
                             var cr = c.Consume(cts.Token);
                             Console.WriteLine($"Consumed message '{cr.Message.Value}' at: '{cr.TopicPartitionOffset}'.");
+                            var user = JsonConvert.DeserializeObject<User>(cr.Message.Value);
+                            Console.WriteLine($"Name: {user.Name} Foo.Bar: {user.Foo.Bar}");
                         }
                         catch (ConsumeException e)
                         {
@@ -46,5 +53,10 @@ namespace KafkaClients.Consumer.Regular
                 }
             }
         }
+    }
+
+    public class Foo
+    {
+        public string Bar { get; set; }
     }
 }
